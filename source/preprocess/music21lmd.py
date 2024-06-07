@@ -75,7 +75,12 @@ def preprocess_music21_song(song, train):
     song_data["title"] = song.metadata.title
     song_data["number"] = song.metadata.number
     song_data["genre"] = str(song.metadata.getCustom("genre")[0]).upper()
-    song_data["artist"] = str(song.metadata.getCustom("artist")[0]).upper()
+    song_data["artist"] = str(song.metadata.getCustom("artist")[0])
+    song_data["fname"] = str(song.metadata.getCustom("fname")[0])
+    song_data["key"] = str(song.metadata.getCustom("key")[0])
+    song_data["bpm"] = str(song.metadata.getCustom("bpm")[0])
+    song_data["chord_progression"] = str(song.metadata.getCustom("chord_progression")[0])
+
     song_data["tracks"] = []
 
     # Add the time signature to the song
@@ -89,6 +94,7 @@ def preprocess_music21_song(song, train):
 
     stream_by_parts = instrument.partitionByInstrument(song)
 
+    # Fill gaps with rests
     for part in stream_by_parts.parts:
         part.makeRests(fillGaps=True, inPlace=True)
 

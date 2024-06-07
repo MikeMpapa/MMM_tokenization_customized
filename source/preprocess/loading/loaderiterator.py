@@ -1,8 +1,22 @@
 from pathlib import Path
 from typing import List, Dict, Optional
-
+import os
 from source.preprocess.loading.serialization import Serializer
 
+import json
+from pathlib import Path
+
+def save_filenames(filename_list, json_file="processed_files.json"):
+    json_file_path = Path(json_file)
+    if json_file_path.exists():
+        with open(json_file_path, 'r') as f:
+            existing_list = json.load(f)
+        updated_list = existing_list + filename_list
+    else:
+        updated_list = filename_list
+
+    with open(json_file_path, 'w') as f:
+        json.dump(updated_list, f)
 
 class LoaderIterator:
     """Iterator that loads data from multiple files in batches"""
@@ -59,11 +73,16 @@ class LoaderIterator:
         start_index = self._current_iteration * self.num_files_per_iteration
         stop_index = start_index + self.num_files_per_iteration
         batch = []
+        process_midi_files = []
         for load_path in self._load_paths[start_index:stop_index]:
             if load_path.exists():
                 try:
                     data = self.serializer.load(load_path)
                     batch.append(data)
+                    process_midi_files.append(str(load_path))
                 except Exception as e:
                     print(f"Failed to load data from {load_path}: {e}")
+                    if "The_Real_Thing.2_20" in load_path.name:
+                        print()
+        save_filenames(process_midi_files)
         return batch

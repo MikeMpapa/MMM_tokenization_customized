@@ -139,6 +139,7 @@ def encode_song_data(
             bar_data["events"] = "bar_fill"
 
         # Start with the tokens
+        token_sequence += ["FNAME=" + str(song_data["fname"])]
         token_sequence += ["PIECE_START"]
         token_sequence += [
             "TIME_SIGNATURE="
@@ -147,7 +148,10 @@ def encode_song_data(
             + str(song_data["time_signature_denominator"])
         ]
         token_sequence += ["GENRE=" + str(song_data["genre"])]
-        token_sequence += ["ARTIST=" + str(song_data["artist"])]
+        #token_sequence += ["ARTIST=" + str(song_data["artist"])]
+        token_sequence += ["KEY=" + str(song_data["key"])]
+        token_sequence += ["BPM=" + str(song_data["bpm"])]
+        token_sequence += ["CP=" + str(song_data["chord_progression"])]
 
         # Get the indices. Permute if necessary
         track_data_indices = list(range(len(song_data["tracks"])))
@@ -169,6 +173,7 @@ def encode_song_data(
             token_sequence += encode_bar_data(
                 bar_data_fill, transposition, bar_fill=True
             )
+        token_sequence += ["PIECE_END"]
 
         token_sequences += [token_sequence]
         count += 1
