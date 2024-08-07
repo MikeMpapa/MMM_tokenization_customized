@@ -79,7 +79,8 @@ def preprocess_music21_song(song, train):
     song_data["fname"] = str(song.metadata.getCustom("fname")[0])
     song_data["key"] = str(song.metadata.getCustom("key")[0])
     song_data["bpm"] = str(song.metadata.getCustom("bpm")[0])
-    song_data["chord_progression"] = str(song.metadata.getCustom("chord_progression")[0])
+    song_data["chord_progression"] = str(song.metadata.getCustom("chord_progression_belinda")[0])
+    song_data["bar_length"] = str(song.metadata.getCustom("bar_length")[0])
 
     song_data["tracks"] = []
 
