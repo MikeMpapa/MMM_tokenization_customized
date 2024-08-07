@@ -53,6 +53,9 @@ class Music21Serializer(Serializer):
         m21_stream.write(fmt=self.save_format, fp=save_path, quantizePost=False)
 
     def load(self, load_path: Path) -> Score:
+        # Get the number of bars for the current segment
+        bar_length = str(load_path).split('bars')[0].split('_')[-1]
+
         # Extract the artist name from the load_path.
         artist_name = load_path.parts[-2]
 
@@ -67,12 +70,15 @@ class Music21Serializer(Serializer):
 
         # Check if the file has metadata on KEY, BPM & CHORD PROGRESSION
         try:
-            music_metadata_fname = ('/').join(load_path.parts[-1:]).replace(".mid", ".wav.json")
+            music_metadata_fname = ('/').join(load_path.parts[-1:]).replace(".mid", ".json")
             music_metadata_fullpath = glob(self.music_metadata_path + f"/*/{music_metadata_fname}")
-            if len(music_metadata_fullpath) == 0:
-                music_metadata_fname = ('/').join(load_path.parts[-1:]).replace(".mid", ".json")
-                music_metadata_fullpath = glob(self.music_metadata_path + f"/*/{music_metadata_fname}")
             music_metadata_fullpath = music_metadata_fullpath[0]
+            # music_metadata_fname = ('/').join(load_path.parts[-1:]).replace(".mid", ".wav.json")
+            # music_metadata_fullpath = glob(self.music_metadata_path + f"/*/{music_metadata_fname}")
+            # if len(music_metadata_fullpath) == 0:
+            #     music_metadata_fname = ('/').join(load_path.parts[-1:]).replace(".mid", ".json")
+            #     music_metadata_fullpath = glob(self.music_metadata_path + f"/*/{music_metadata_fname}")
+            # music_metadata_fullpath = music_metadata_fullpath[0]
         except FileExistsError:
             print(f"Metadata file not found: {music_metadata_fullpath}")
             raise ValueError("Metadata file not found")
@@ -126,6 +132,7 @@ class Music21Serializer(Serializer):
         stream.metadata.setCustom("fname", fname)
         stream.metadata.setCustom("key", key)
         stream.metadata.setCustom("bpm", bpm)
-        stream.metadata.setCustom("chord_progression", chord_progression)
+        stream.metadata.setCustom("chord_progression_belinda", chord_progression)
+        stream.metadata.setCustom("bar_length", bar_length)
 
         return stream
