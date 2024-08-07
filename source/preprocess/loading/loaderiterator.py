@@ -70,19 +70,49 @@ class LoaderIterator:
         return False
 
     def _load_data_batch(self) -> List[Dict]:
-        start_index = self._current_iteration * self.num_files_per_iteration
-        stop_index = start_index + self.num_files_per_iteration
+        # Load processed files
+        processed_files = []
+        json_file_path = Path("processed_files.json")
+        if json_file_path.exists():
+            with open(json_file_path, 'r') as f:
+                processed_files = json.load(f)
+        processed_files = list(set(processed_files))
+        #start_index = self._current_iteration * self.num_files_per_iteration
+        #stop_index = start_index + self.num_files_per_iteration
+
         batch = []
         process_midi_files = []
-        for load_path in self._load_paths[start_index:stop_index]:
+        # for load_path in self._load_paths[start_index:stop_index]:
+        #     if str(load_path) in processed_files:
+        #         processed_files.pop(processed_files.index(str(load_path)))
+        #         continue
+        #     if load_path.exists():
+        #         try:
+        #             data = self.serializer.load(load_path)
+        #             batch.append(data)
+        #             process_midi_files.append(str(load_path))
+        #         except Exception as e:
+        #             print(f"Failed to load data from {load_path}: {e}")
+                   # if "The_Real_Thing.2_20" in load_path.name:
+                    #    print()
+        processed_count = 0
+        for idx,load_path in enumerate(self._load_paths):
+            # Check if load_path is in processed_files
+            if str(load_path) in processed_files:
+                print('CONTINUE:',load_path)
+                continue
             if load_path.exists():
                 try:
                     data = self.serializer.load(load_path)
                     batch.append(data)
                     process_midi_files.append(str(load_path))
+                    processed_count += 1
+                    if processed_count >= self.num_files_per_iteration:
+                        break
                 except Exception as e:
                     print(f"Failed to load data from {load_path}: {e}")
-                    if "The_Real_Thing.2_20" in load_path.name:
-                        print()
+
         save_filenames(process_midi_files)
+        print(idx)
+        print(len(batch))
         return batch
