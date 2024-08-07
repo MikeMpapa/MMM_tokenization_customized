@@ -152,21 +152,32 @@ def encode_song_data(
         token_sequence += ["KEY=" + str(song_data["key"])]
         token_sequence += ["BPM=" + str(song_data["bpm"])]
         token_sequence += ["CP=" + str(song_data["chord_progression"])]
+        token_sequence += ["BARLENGTH=" + str(song_data["bar_length"])]
 
         # Get the indices. Permute if necessary
         track_data_indices = list(range(len(song_data["tracks"])))
         if permute:
             random.shuffle(track_data_indices)
 
+        instrument_list = []
+        encoded_track_sequences = []
         # Encode the tracks
         for track_data_index in track_data_indices:
             track_data = song_data["tracks"][track_data_index]
 
             # Encode the track. Insert density tokens and transpose
-            encoded_track_data = encode_track_data(
+            encoded_track_data, INST = encode_track_data(
                 track_data, density_bins, bar_start_index, bar_end_index, transposition
             )
-            token_sequence += encoded_track_data
+            encoded_track_sequences.append((' ').join(encoded_track_data))
+            instrument_list.append(INST)
+
+        # Add the unique instruments as metadata and concatenate the encoded tracks
+        instrument_list = ('_').join(instrument_list)
+        token_sequence += ["INSTLIST=" + str(instrument_list)]
+        encoded_track_sequences = (' ').join(encoded_track_sequences)
+        token_sequence += [encoded_track_sequences]
+
 
         # Encode the fill tokens
         if bar_fill:
@@ -186,7 +197,7 @@ def encode_track_data(
     track_data, density_bins, bar_start_index, bar_end_index, transposition
 ):
     tokens = []
-
+    instrument = None
     tokens += ["TRACK_START"]
 
     # Set an instrument
@@ -195,11 +206,13 @@ def encode_track_data(
     # Set the instrument if it is not a drum
     if not track_data.get("drums", False):
         tokens += [f"INST={number}"]
+        instrument = str(number)
 
     # Set the instrument if it is drums. Do not transpose
     else:
         tokens += ["INST=DRUMS"]
         transposition = 0
+        instrument = "DRUMS"
 
     # Count NOTE_ON events
     note_on_events = 0
@@ -220,7 +233,7 @@ def encode_track_data(
 
     tokens += ["TRACK_END"]
 
-    return tokens
+    return tokens, instrument
 
 
 def encode_bar_data(bar_data, transposition, bar_fill=False):
