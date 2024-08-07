@@ -58,9 +58,9 @@ def main() -> None:
     batch_size = dataset_creator_config.num_files_per_iteration
 
     logger.info("Creating loader iterator...")
-    #lakh_clean_version_dataset = midi_paths[0].parts[-3].split('_')[-1]
-    #loader_iterator = LoaderIterator(Music21Serializer(lakh_clean_version = lakh_clean_version_dataset, batch_size, midi_paths)
-    loader_iterator = LoaderIterator(Music21Serializer(),batch_size, midi_paths)
+    lakh_clean_version_dataset = midi_paths[0].parts[-3].split('_')[-1]
+    loader_iterator = LoaderIterator(Music21Serializer(lakh_clean_version = lakh_clean_version_dataset), batch_size, midi_paths)
+    #loader_iterator = LoaderIterator(Music21Serializer(),batch_size, midi_paths)
 
     logger.info(f"Loader iterator ready.")
 
