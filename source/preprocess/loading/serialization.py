@@ -33,10 +33,11 @@ class Music21Serializer(Serializer):
             self,
             lakh_clean_version: str = "8bars",
             save_format: str = "midi",
-            genre_file: Path = "/Users/apoxeredhs/Documents/MyProjects/MIDITokenization/mmm_tokenizer_lmd_clean/source/preprocess/loading/lmd_genres.csv",
+            genre_file: Path = "/MMM_tokenization_customized/source/preprocess/loading/"+"lmd_genres.csv",
     ) -> None:
         self.save_format = save_format
         # Read the genre CSV file into a DataFrame.
+        
         self.genre_df = pd.read_csv(genre_file)
         self.bars_per_track = int(lakh_clean_version.replace("bars", ""))
 
@@ -53,6 +54,7 @@ class Music21Serializer(Serializer):
         m21_stream.write(fmt=self.save_format, fp=save_path, quantizePost=False)
 
     def load(self, load_path: Path) -> Score:
+        print("I AM IN HERE")
         # Get the number of bars for the current segment
         bar_length = str(load_path).split('bars')[0].split('_')[-1]
 
@@ -66,6 +68,7 @@ class Music21Serializer(Serializer):
         genre = genre_row["Genre_ChatGPT"].values[0] if not genre_row.empty else "other"
         artist = artist_name
         artist = re.sub(r'[^\w]', '', artist.upper())
+        print("---ALSO HERE---")
 
 
         # Check if the file has metadata on KEY, BPM & CHORD PROGRESSION
