@@ -1,3 +1,5 @@
 music21
-pydantic_argparse
+pydantic_argparse==0.8.0
 pandas
+musiclang
+musiclang-predict
